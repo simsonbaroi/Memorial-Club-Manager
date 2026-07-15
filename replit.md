@@ -1,45 +1,74 @@
-# [Project name]
+# MCHCMS — Memorial Christian Hospital Club Management System
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A complete ERP/PWA for Memorial Christian Hospital Club, Malumghat, Chakaria, Cox's Bazar, Bangladesh. Manages all financial and administrative activities: income, expenses, donations, receipt/voucher books, reports, committee, events, and audit trail.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/mchcms run dev` — run the frontend app (port 20791, preview at `/`)
 - `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Default login: **admin / admin123** | Cashier login: **cashier / cashier123**
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Frontend: React + Vite + TailwindCSS + Wouter routing
+- Database: Dexie.js (IndexedDB — browser-native, no server required)
+- Charts: Recharts
+- PDF: jsPDF + jspdf-autotable
+- QR Codes: qrcode.react
+- Excel/CSV: xlsx (SheetJS)
+- Auth: Web Crypto API (PBKDF2) — no external library
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/mchcms/src/db/schema.ts` — all TypeScript types/interfaces
+- `artifacts/mchcms/src/db/index.ts` — Dexie database class, sequence generators, dashboard stats
+- `artifacts/mchcms/src/db/seed.ts` — initial seed data (users, categories, sample transactions)
+- `artifacts/mchcms/src/contexts/AuthContext.tsx` — auth state, login/logout, permission checks
+- `artifacts/mchcms/src/contexts/ThemeContext.tsx` — dark/light/system theme
+- `artifacts/mchcms/src/lib/crypto.ts` — PBKDF2 password hashing (Web Crypto API)
+- `artifacts/mchcms/src/lib/audit.ts` — audit log helper
+- `artifacts/mchcms/src/lib/export.ts` — Excel/CSV export, currency/date formatters
+- `artifacts/mchcms/src/lib/backup.ts` — JSON backup/restore
+- `artifacts/mchcms/src/pages/` — all 17 pages
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- **100% offline, no backend**: All data lives in browser IndexedDB via Dexie.js. No server, no paid APIs.
+- **Soft deletes only**: Financial records are never hard-deleted (`isDeleted: true` flag).
+- **Immutable audit log**: Every create/update/delete/approve action is recorded in `auditLogs` table, never deleted.
+- **Workflow states**: Records follow Draft → Pending → Approved → Locked → Archived.
+- **Backup via JSON file**: Export full DB snapshot as JSON; restore by re-importing.
+- **Timezone**: All display uses Asia/Dhaka (UTC+06:00). ISO 8601 stored internally.
+- **Currency**: Bangladeshi Taka (৳ BDT). Stored as float, displayed with formatCurrencyBDT().
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Dashboard with balance summary, income/expense charts (12-month), recent transactions
+- Income module: employee contribution, hospital contribution, donations, events, misc
+- Expense module: categorized with voucher number validation
+- Donation module: donor records, receipt generation
+- Receipt & Voucher book management with number tracking and validation
+- Reports: filterable by date range, exportable to PDF/Excel/CSV
+- Committee management with member records
+- Event management with budget tracking
+- Full audit trail (immutable)
+- User management with 8 roles and per-permission configuration
+- Backup/restore system
+- Dark/light/system theme toggle
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- No paid APIs, no external cloud services — everything runs locally
+- No emojis in UI
+- Hospital Blue (#1565C0) primary, Gold/Amber (#F9A825) accent
+- Date format: "15th July 2026" (British style), timezone Asia/Dhaka
+- Currency: ৳ BDT
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
-
-## Pointers
-
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- Always use soft deletes: `db.incomes.update(id, { isDeleted: true })` never `db.incomes.delete(id)`
+- Receipt/voucher number validation must run against active book ranges
+- Seed runs once on first load (checks `settings` table for `seeded` key)
+- Password hashing is async (PBKDF2 via Web Crypto) — always await
+- `useLiveQuery` returns `undefined` during initial load — always handle loading state

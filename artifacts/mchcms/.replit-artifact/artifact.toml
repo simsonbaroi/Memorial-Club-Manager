@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "MCHCMS – Memorial Christian Hospital Club"
+version = "1.0.0"
+id = "artifacts/mchcms"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20791
+
+[services.development]
+run = "pnpm --filter @workspace/mchcms run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/mchcms", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/mchcms/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20791"
+BASE_PATH = "/"
