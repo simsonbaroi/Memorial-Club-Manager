@@ -22,7 +22,6 @@ export type Permission =
   | 'advance:create' | 'advance:read' | 'advance:update' | 'advance:approve' | 'advance:settle'
   | 'budget:create' | 'budget:read' | 'budget:update' | 'budget:approve'
   | 'memo:create' | 'memo:read' | 'memo:update'
-  | 'promise:create' | 'promise:read' | 'promise:update'
   | 'user:create' | 'user:read' | 'user:update' | 'user:delete'
   | 'settings:read' | 'settings:update'
   | 'audit:read'
@@ -41,7 +40,6 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'advance:create','advance:read','advance:update','advance:approve','advance:settle',
     'budget:create','budget:read','budget:update','budget:approve',
     'memo:create','memo:read','memo:update',
-    'promise:create','promise:read','promise:update',
     'user:create','user:read','user:update','user:delete',
     'settings:read','settings:update',
     'audit:read',
@@ -57,7 +55,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'event:read','event:update',
     'advance:read','advance:approve',
     'budget:read','budget:approve',
-    'memo:read','promise:read',
+    'memo:read',
     'user:read','settings:read','audit:read',
   ],
   vice_president: [
@@ -70,7 +68,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'event:read','event:update',
     'advance:read','advance:approve',
     'budget:read',
-    'memo:read','promise:read',
+    'memo:read',
     'user:read','audit:read',
   ],
   secretary: [
@@ -85,7 +83,6 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'advance:create','advance:read','advance:update','advance:settle',
     'budget:create','budget:read','budget:update',
     'memo:create','memo:read','memo:update',
-    'promise:create','promise:read','promise:update',
     'user:read','audit:read',
   ],
   cashier: [
@@ -98,25 +95,24 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'advance:create','advance:read','advance:update','advance:settle',
     'budget:read',
     'memo:create','memo:read',
-    'promise:read',
   ],
   committee_member: [
     'income:read','expense:read','donation:read','report:read',
     'event:read','committee:read',
-    'advance:read','budget:read','memo:read','promise:read',
+    'advance:read','budget:read','memo:read',
   ],
   auditor: [
     'income:read','expense:read','donation:read',
     'receipt_book:read','voucher_book:read',
     'report:read','report:export',
     'committee:read','event:read',
-    'advance:read','budget:read','memo:read','promise:read',
+    'advance:read','budget:read','memo:read',
     'user:read','audit:read',
   ],
   viewer: [
     'income:read','expense:read','donation:read','report:read',
     'event:read','committee:read',
-    'advance:read','budget:read','memo:read','promise:read',
+    'advance:read','budget:read','memo:read',
   ],
 };
 
@@ -327,7 +323,7 @@ export interface VoucherNumberRecord {
 export type AttachmentType = 'image' | 'pdf' | 'document';
 export type RecordType =
   | 'income' | 'expense' | 'donation' | 'event' | 'committee_member'
-  | 'report' | 'advance' | 'budget' | 'memo' | 'promise';
+  | 'report' | 'advance' | 'budget' | 'memo';
 
 export interface Attachment {
   id?: number;
@@ -369,7 +365,7 @@ export type AuditModule =
   | 'income' | 'expense' | 'donation'
   | 'receipt_book' | 'voucher_book'
   | 'report' | 'committee' | 'event'
-  | 'advance' | 'budget' | 'memo' | 'promise'
+  | 'advance' | 'budget' | 'budget_template' | 'memo'
   | 'user' | 'settings' | 'backup' | 'auth';
 
 export interface AuditLog {
@@ -456,21 +452,34 @@ export interface ClubEvent {
   updatedAt: string;
 }
 
-// ─── Event Budget ─────────────────────────────────────────────────────────────
+// ─── Budget Management ────────────────────────────────────────────────────────
 
 export type BudgetStatus = 'draft' | 'pending' | 'approved' | 'locked';
+export type BudgetScope = 'organization' | 'event';
 
 export interface Budget {
   id?: number;
   budgetCode: string;
   name: string;
-  eventId: number;
+  scope: BudgetScope;
+  eventId?: number;          // set when scope === 'event'
+  fiscalYear?: string;       // set when scope === 'organization', e.g. "2026"
   approvalStatus: BudgetStatus;
   createdBy: number;
   createdByName: string;
   lastModifiedBy?: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface BudgetTemplate {
+  id?: number;
+  name: string;
+  description?: string;
+  categoryNames: string[];
+  createdBy: number;
+  createdByName: string;
+  createdAt: string;
 }
 
 export interface BudgetCategory {
@@ -587,35 +596,12 @@ export interface Memo {
   updatedAt: string;
 }
 
-// ─── Promise Register ─────────────────────────────────────────────────────────
-
-export type PromiseStatus = 'promised' | 'confirmed' | 'received' | 'cancelled';
-
-export interface PromiseRecord {
-  id?: number;
-  promiseCode: string;
-  promisedBy: string;         // person or org name
-  phone?: string;
-  amount: number;
-  description: string;        // what was promised
-  promiseDate: string;
-  expectedDate?: string;
-  status: PromiseStatus;
-  receivedAmount?: number;
-  receivedDate?: string;
-  notes?: string;
-  reminderDate?: string;
-  createdBy: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
 // ─── Notifications ────────────────────────────────────────────────────────────
 
 export type NotificationType =
   | 'contribution_reminder' | 'hospital_contribution_reminder'
   | 'pending_approval' | 'low_voucher_count' | 'backup_reminder'
-  | 'event_reminder' | 'advance_overdue' | 'promise_due' | 'general';
+  | 'event_reminder' | 'advance_overdue' | 'budget_review' | 'general';
 
 export interface AppNotification {
   id?: number;

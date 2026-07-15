@@ -27,7 +27,8 @@ import { AdvanceForm } from '@/pages/Advances/AdvanceForm';
 import { AdvanceDetail } from '@/pages/Advances/AdvanceDetail';
 import { CashBook } from '@/pages/CashBook/CashBook';
 import { Memos } from '@/pages/Memos/Memos';
-import { Promises } from '@/pages/Promises/Promises';
+import { BudgetManagement } from '@/pages/Budget/BudgetManagement';
+import { BudgetDetail } from '@/pages/Budget/BudgetDetail';
 import { AuditLog } from '@/pages/Audit/AuditLog';
 import { Settings } from '@/pages/Settings/Settings';
 
@@ -74,7 +75,8 @@ function App() {
                       <Route path="/advances/new" component={AdvanceForm} />
                       <Route path="/advances/:id" component={AdvanceDetail} />
                       <Route path="/memos" component={Memos} />
-                      <Route path="/promises" component={Promises} />
+                      <Route path="/budget-management" component={BudgetManagement} />
+                      <Route path="/budget-management/:id" component={BudgetDetail} />
                       <Route path="/audit" component={AuditLog} />
                       <Route path="/settings" component={Settings} />
                       <Route component={NotFound} />

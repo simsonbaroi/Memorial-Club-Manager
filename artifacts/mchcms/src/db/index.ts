@@ -4,8 +4,8 @@ import type {
   ReceiptBook, ReceiptNumberRecord, VoucherBook, VoucherNumberRecord,
   Attachment, AuditLog, Committee, CommitteeMember, CommitteeHandover,
   ClubEvent, AppNotification, Setting, Session,
-  Note, Advance, AdvanceSettlement, Budget, BudgetCategory, BudgetRevision,
-  Reminder, Memo, PromiseRecord,
+  Note, Advance, AdvanceSettlement, Budget, BudgetCategory, BudgetRevision, BudgetTemplate,
+  Reminder, Memo,
 } from './schema';
 
 export class MCHCMSDatabase extends Dexie {
@@ -36,7 +36,8 @@ export class MCHCMSDatabase extends Dexie {
   budgetRevisions!: Table<BudgetRevision, number>;
   reminders!: Table<Reminder, number>;
   memos!: Table<Memo, number>;
-  promises!: Table<PromiseRecord, number>;
+  // v3
+  budgetTemplates!: Table<BudgetTemplate, number>;
 
   constructor() {
     super('mchcms_db');
@@ -72,6 +73,17 @@ export class MCHCMSDatabase extends Dexie {
       reminders:          '++id, type, dueDate, status, createdBy',
       memos:              '++id, memoNumber, date, priority, status, createdBy',
       promises:           '++id, promiseCode, promisedBy, status, promiseDate, createdBy',
+    });
+
+    // v3: Promises menu retired — the Budget Management module now covers
+    // pledge-style planning via organization-level budgets. Drop the old
+    // 'promises' store and add reusable budget category templates.
+    this.version(3).stores({
+      promises: null,
+      budgetTemplates: '++id, name, createdBy',
+    }).upgrade(async () => {
+      // No data migration needed: promise records tracked pledges, which are
+      // conceptually distinct from budget line items, so nothing carries over.
     });
   }
 }
@@ -116,10 +128,6 @@ export async function generateBudgetCode(): Promise<string> {
 export async function generateMemoCode(): Promise<string> {
   const n = await getNextSequence('memo');
   return `MEM-${new Date().getFullYear()}-${String(n).padStart(6, '0')}`;
-}
-export async function generatePromiseCode(): Promise<string> {
-  const n = await getNextSequence('promise');
-  return `PRO-${new Date().getFullYear()}-${String(n).padStart(6, '0')}`;
 }
 
 // ─── Receipt / Voucher number validation ─────────────────────────────────────

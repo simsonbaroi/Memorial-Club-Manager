@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Building2, LayoutDashboard, Wallet, Receipt, Heart, BookOpen,
   FileText, Users, Calendar, ShieldAlert, Settings, LogOut, Sun, Moon,
-  CreditCard, BookMarked, StickyNote, Handshake, BookOpenCheck
+  CreditCard, BookMarked, StickyNote, PiggyBank, BookOpenCheck
 } from 'lucide-react';
 
 export function NavSidebar() {
@@ -64,6 +64,7 @@ export function NavSidebar() {
               <NavItem href="/donations" icon={Heart} label="Donations" />
               <NavItem href="/advances" icon={CreditCard} label="Advances" />
               <NavItem href="/cashbook" icon={BookOpenCheck} label="Cash Book" />
+              <NavItem href="/budget-management" icon={PiggyBank} label="Budget Management" />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -94,7 +95,6 @@ export function NavSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <NavItem href="/memos" icon={StickyNote} label="Memo Book" />
-              <NavItem href="/promises" icon={Handshake} label="Promises" />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
