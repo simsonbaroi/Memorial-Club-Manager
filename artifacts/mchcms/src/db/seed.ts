@@ -139,73 +139,53 @@ export async function seedIfNeeded() {
     await db.settings.put({ key: s.key, value: JSON.stringify(s.value), updatedAt: now });
   }
 
-  // Seed sample incomes
-  const sampleIncomes = [
-    { category: 'employee_contribution', amount: 3100, description: 'Employee contribution - June 2026', source: 'Employees', receiptNumber: 'DR-000001', date: '2026-06-01' },
-    { category: 'hospital_contribution', amount: 500, description: 'Hospital contribution - June 2026', source: 'MCH Hospital', receiptNumber: 'DR-000002', date: '2026-06-01' },
-    { category: 'donation', amount: 5000, description: 'Donation for annual meal', source: 'Dr. John Smith', receiptNumber: 'DR-000003', date: '2026-06-15' },
-    { category: 'employee_contribution', amount: 3100, description: 'Employee contribution - July 2026', source: 'Employees', receiptNumber: 'DR-000004', date: '2026-07-01' },
-    { category: 'hospital_contribution', amount: 500, description: 'Hospital contribution - July 2026', source: 'MCH Hospital', receiptNumber: 'DR-000005', date: '2026-07-01' },
-    { category: 'special_donation', amount: 10000, description: 'Special donation for football tournament', source: 'Anonymous', receiptNumber: 'DR-000006', date: '2026-07-05' },
-    { category: 'event_income', amount: 2500, description: 'Football tournament entry fees', source: 'Participants', receiptNumber: 'DR-000007', date: '2026-07-10' },
-  ];
-
-  for (let i = 0; i < sampleIncomes.length; i++) {
-    const inc = sampleIncomes[i];
-    await db.incomes.add({
-      incomeCode: `INC-2026-${String(i + 1).padStart(6, '0')}`,
-      receiptNumber: inc.receiptNumber,
-      date: inc.date,
-      entryDate: now,
-      amount: inc.amount,
-      description: inc.description,
-      source: inc.source,
-      category: inc.category,
-      status: 'approved',
-      isDeleted: false,
-      version: 1,
-      createdBy: 1,
-      approvedBy: 1,
-      approvedAt: now,
-      createdAt: now,
-      updatedAt: now,
-    });
-  }
-
-  // Seed sample expenses
-  const sampleExpenses = [
-    { category: 'office_supplies', amount: 800, description: 'Stationery for office', payee: 'Local Shop', voucherNumber: 'PV-000001', date: '2026-06-05' },
-    { category: 'tea', amount: 450, description: 'Tea and refreshments for meetings', payee: 'Canteen', voucherNumber: 'PV-000002', date: '2026-06-10' },
-    { category: 'meeting', amount: 1200, description: 'Monthly committee meeting expenses', payee: 'Hotel Dining', voucherNumber: 'PV-000003', date: '2026-06-15' },
-    { category: 'printing', amount: 600, description: 'Printing of notice boards', payee: 'Print Shop', voucherNumber: 'PV-000004', date: '2026-07-02' },
-    { category: 'football_tournament', amount: 5000, description: 'Football tournament preparations', payee: 'Sports Shop', voucherNumber: 'PV-000005', date: '2026-07-08' },
-  ];
-
-  for (let i = 0; i < sampleExpenses.length; i++) {
-    const exp = sampleExpenses[i];
-    await db.expenses.add({
-      expenseCode: `EXP-2026-${String(i + 1).padStart(6, '0')}`,
-      voucherNumber: exp.voucherNumber,
-      date: exp.date,
-      entryDate: now,
-      amount: exp.amount,
-      payee: exp.payee,
-      description: exp.description,
-      category: exp.category,
-      status: 'approved',
-      isDeleted: false,
-      version: 1,
-      createdBy: 1,
-      approvedBy: 1,
-      approvedAt: now,
-      createdAt: now,
-      updatedAt: now,
-    });
-  }
-
-  // Update sequence counters
-  await db.settings.put({ key: 'seq_income', value: JSON.stringify(sampleIncomes.length), updatedAt: now });
-  await db.settings.put({ key: 'seq_expense', value: JSON.stringify(sampleExpenses.length), updatedAt: now });
+  // No sample/demo transactions are seeded — the ledger starts empty so every
+  // number in the app reflects real club data from day one.
+  await db.settings.put({ key: 'seq_income', value: JSON.stringify(0), updatedAt: now });
+  await db.settings.put({ key: 'seq_expense', value: JSON.stringify(0), updatedAt: now });
   await db.settings.put({ key: 'seq_donation', value: JSON.stringify(0), updatedAt: now });
   await db.settings.put({ key: 'seq_event', value: JSON.stringify(0), updatedAt: now });
+}
+
+// ─── One-time cleanup for installs seeded before demo data was removed ───────
+// Earlier versions of seedIfNeeded() inserted 7 sample incomes and 5 sample
+// expenses (codes INC-2026-000001..007 / EXP-2026-000001..005) so the
+// dashboard had something to show. This removes them from any database that
+// already has them, then resets the affected sequence counters so newly
+// created records start from 1 again.
+const DEMO_INCOME_CODES = Array.from({ length: 7 }, (_, i) => `INC-2026-${String(i + 1).padStart(6, '0')}`);
+const DEMO_EXPENSE_CODES = Array.from({ length: 5 }, (_, i) => `EXP-2026-${String(i + 1).padStart(6, '0')}`);
+
+export async function cleanupDemoSeedData() {
+  const flag = await db.settings.get('demo_data_cleaned');
+  if (flag) return;
+
+  const removedIncomes = await db.incomes.where('incomeCode').anyOf(DEMO_INCOME_CODES).toArray();
+  const removedExpenses = await db.expenses.where('expenseCode').anyOf(DEMO_EXPENSE_CODES).toArray();
+
+  if (removedIncomes.length) {
+    await db.incomes.bulkDelete(removedIncomes.map(r => r.id!));
+  }
+  if (removedExpenses.length) {
+    await db.expenses.bulkDelete(removedExpenses.map(r => r.id!));
+  }
+
+  const now = new Date().toISOString();
+
+  // Only reset sequence counters if nothing else has been recorded since —
+  // otherwise we'd renumber real transactions the user already created.
+  if (removedIncomes.length) {
+    const remainingIncomes = await db.incomes.count();
+    if (remainingIncomes === 0) {
+      await db.settings.put({ key: 'seq_income', value: JSON.stringify(0), updatedAt: now });
+    }
+  }
+  if (removedExpenses.length) {
+    const remainingExpenses = await db.expenses.count();
+    if (remainingExpenses === 0) {
+      await db.settings.put({ key: 'seq_expense', value: JSON.stringify(0), updatedAt: now });
+    }
+  }
+
+  await db.settings.put({ key: 'demo_data_cleaned', value: JSON.stringify(true), updatedAt: now });
 }

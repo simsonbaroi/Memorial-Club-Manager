@@ -4,7 +4,7 @@ import type { User, UserRole, Permission } from '../db/schema';
 import { ROLE_PERMISSIONS } from '../db/schema';
 import { verifyPassword, generateToken } from '../lib/crypto';
 import { logAudit } from '../lib/audit';
-import { seedIfNeeded } from '../db/seed';
+import { seedIfNeeded, cleanupDemoSeedData } from '../db/seed';
 
 interface AuthUser extends Omit<User, 'passwordHash' | 'salt'> {
   id: number;
@@ -34,6 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function initAuth() {
     try {
       await seedIfNeeded();
+      await cleanupDemoSeedData();
       // Restore session from localStorage
       const token = localStorage.getItem('mchcms_token');
       if (token) {
