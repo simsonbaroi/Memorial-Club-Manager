@@ -19,6 +19,10 @@ export type Permission =
   | 'report:read' | 'report:export'
   | 'committee:create' | 'committee:read' | 'committee:update'
   | 'event:create' | 'event:read' | 'event:update' | 'event:delete'
+  | 'advance:create' | 'advance:read' | 'advance:update' | 'advance:approve' | 'advance:settle'
+  | 'budget:create' | 'budget:read' | 'budget:update' | 'budget:approve'
+  | 'memo:create' | 'memo:read' | 'memo:update'
+  | 'promise:create' | 'promise:read' | 'promise:update'
   | 'user:create' | 'user:read' | 'user:update' | 'user:delete'
   | 'settings:read' | 'settings:update'
   | 'audit:read'
@@ -34,6 +38,10 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'report:read','report:export',
     'committee:create','committee:read','committee:update',
     'event:create','event:read','event:update','event:delete',
+    'advance:create','advance:read','advance:update','advance:approve','advance:settle',
+    'budget:create','budget:read','budget:update','budget:approve',
+    'memo:create','memo:read','memo:update',
+    'promise:create','promise:read','promise:update',
     'user:create','user:read','user:update','user:delete',
     'settings:read','settings:update',
     'audit:read',
@@ -47,9 +55,10 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'report:read','report:export',
     'committee:read','committee:update',
     'event:read','event:update',
-    'user:read',
-    'settings:read',
-    'audit:read',
+    'advance:read','advance:approve',
+    'budget:read','budget:approve',
+    'memo:read','promise:read',
+    'user:read','settings:read','audit:read',
   ],
   vice_president: [
     'income:read','income:approve',
@@ -59,8 +68,10 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'report:read','report:export',
     'committee:read',
     'event:read','event:update',
-    'user:read',
-    'audit:read',
+    'advance:read','advance:approve',
+    'budget:read',
+    'memo:read','promise:read',
+    'user:read','audit:read',
   ],
   secretary: [
     'income:create','income:read','income:update',
@@ -71,8 +82,11 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'report:read','report:export',
     'committee:read','committee:update',
     'event:create','event:read','event:update',
-    'user:read',
-    'audit:read',
+    'advance:create','advance:read','advance:update','advance:settle',
+    'budget:create','budget:read','budget:update',
+    'memo:create','memo:read','memo:update',
+    'promise:create','promise:read','promise:update',
+    'user:read','audit:read',
   ],
   cashier: [
     'income:create','income:read','income:update',
@@ -81,33 +95,28 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'receipt_book:read','voucher_book:read',
     'report:read','report:export',
     'event:read',
+    'advance:create','advance:read','advance:update','advance:settle',
+    'budget:read',
+    'memo:create','memo:read',
+    'promise:read',
   ],
   committee_member: [
-    'income:read',
-    'expense:read',
-    'donation:read',
-    'report:read',
-    'event:read',
-    'committee:read',
+    'income:read','expense:read','donation:read','report:read',
+    'event:read','committee:read',
+    'advance:read','budget:read','memo:read','promise:read',
   ],
   auditor: [
-    'income:read',
-    'expense:read',
-    'donation:read',
+    'income:read','expense:read','donation:read',
     'receipt_book:read','voucher_book:read',
     'report:read','report:export',
-    'committee:read',
-    'event:read',
-    'user:read',
-    'audit:read',
+    'committee:read','event:read',
+    'advance:read','budget:read','memo:read','promise:read',
+    'user:read','audit:read',
   ],
   viewer: [
-    'income:read',
-    'expense:read',
-    'donation:read',
-    'report:read',
-    'event:read',
-    'committee:read',
+    'income:read','expense:read','donation:read','report:read',
+    'event:read','committee:read',
+    'advance:read','budget:read','memo:read','promise:read',
   ],
 };
 
@@ -121,10 +130,10 @@ export interface User {
   role: UserRole;
   customPermissions?: Permission[];
   isActive: boolean;
-  photo?: string; // base64
-  lastLogin?: string; // ISO
-  createdAt: string; // ISO
-  updatedAt: string; // ISO
+  photo?: string;
+  lastLogin?: string;
+  createdAt: string;
+  updatedAt: string;
   createdBy?: number;
 }
 
@@ -150,36 +159,27 @@ export interface Category {
 // ─── Income ───────────────────────────────────────────────────────────────────
 
 export type IncomeCategory =
-  | 'employee_contribution'
-  | 'hospital_contribution'
-  | 'donation'
-  | 'special_donation'
-  | 'event_income'
-  | 'interest'
-  | 'miscellaneous'
-  | 'custom';
+  | 'employee_contribution' | 'hospital_contribution' | 'donation'
+  | 'special_donation' | 'event_income' | 'interest' | 'miscellaneous' | 'custom';
 
 export interface Income {
   id?: number;
-  incomeCode: string; // e.g. INC-2024-000001
-  receiptNumber: string; // e.g. DR-000245
-  date: string; // ISO date
-  entryDate: string; // ISO datetime
+  incomeCode: string;
+  receiptNumber: string;
+  date: string;
+  entryDate: string;
   amount: number;
   description: string;
   source: string;
   category: IncomeCategory | string;
   remarks?: string;
   status: RecordStatus;
-  // Employee contribution specifics
   employeeCount?: number;
   contributionPerEmployee?: number;
   month?: number;
   year?: number;
-  // Hospital contribution specifics
   contributionMonth?: number;
   contributionYear?: number;
-  // Links
   eventId?: number;
   createdBy: number;
   approvedBy?: number;
@@ -197,25 +197,14 @@ export interface Income {
 // ─── Expense ──────────────────────────────────────────────────────────────────
 
 export type ExpenseCategory =
-  | 'office_supplies'
-  | 'refreshments'
-  | 'tea'
-  | 'meeting'
-  | 'football_tournament'
-  | 'annual_meal'
-  | 'transportation'
-  | 'printing'
-  | 'stationery'
-  | 'decoration'
-  | 'prize'
-  | 'medical_help'
-  | 'miscellaneous'
-  | 'custom';
+  | 'office_supplies' | 'refreshments' | 'tea' | 'meeting'
+  | 'football_tournament' | 'annual_meal' | 'transportation' | 'printing'
+  | 'stationery' | 'decoration' | 'prize' | 'medical_help' | 'miscellaneous' | 'custom';
 
 export interface Expense {
   id?: number;
   expenseCode: string;
-  voucherNumber: string; // e.g. PV-000580
+  voucherNumber: string;
   date: string;
   entryDate: string;
   amount: number;
@@ -270,7 +259,7 @@ export type BookStatus = 'unused' | 'active' | 'used' | 'voided' | 'missing' | '
 export interface ReceiptBook {
   id?: number;
   bookNumber: string;
-  prefix: string; // e.g. DR
+  prefix: string;
   startNumber: number;
   endNumber: number;
   issueDate: string;
@@ -289,7 +278,7 @@ export type ReceiptNumberStatus = 'unused' | 'used' | 'voided' | 'missing' | 'da
 export interface ReceiptNumberRecord {
   id?: number;
   bookId: number;
-  number: string; // full formatted e.g. DR-000245
+  number: string;
   numericValue: number;
   status: ReceiptNumberStatus;
   usedAt?: string;
@@ -307,7 +296,7 @@ export interface VoucherBook {
   id?: number;
   bookNumber: string;
   type: VoucherType;
-  prefix: string; // e.g. PV
+  prefix: string;
   startNumber: number;
   endNumber: number;
   issueDate: string;
@@ -324,7 +313,7 @@ export interface VoucherBook {
 export interface VoucherNumberRecord {
   id?: number;
   bookId: number;
-  number: string; // full formatted e.g. PV-000580
+  number: string;
   numericValue: number;
   status: ReceiptNumberStatus;
   usedAt?: string;
@@ -336,7 +325,9 @@ export interface VoucherNumberRecord {
 // ─── Attachments ──────────────────────────────────────────────────────────────
 
 export type AttachmentType = 'image' | 'pdf' | 'document';
-export type RecordType = 'income' | 'expense' | 'donation' | 'event' | 'committee_member' | 'report';
+export type RecordType =
+  | 'income' | 'expense' | 'donation' | 'event' | 'committee_member'
+  | 'report' | 'advance' | 'budget' | 'memo' | 'promise';
 
 export interface Attachment {
   id?: number;
@@ -352,31 +343,46 @@ export interface Attachment {
   description?: string;
 }
 
+// ─── Notes / Timeline ─────────────────────────────────────────────────────────
+
+export interface Note {
+  id?: number;
+  recordType: RecordType;
+  recordId: number;
+  comment: string;
+  attachmentId?: number;
+  createdBy: number;
+  createdByName: string;
+  createdAt: string; // ISO — immutable
+}
+
 // ─── Audit Log ────────────────────────────────────────────────────────────────
 
 export type AuditAction =
   | 'create' | 'update' | 'delete' | 'restore'
   | 'approve' | 'reject' | 'lock' | 'unlock'
   | 'print' | 'export' | 'backup' | 'restore_backup'
-  | 'login' | 'logout' | 'login_failed';
+  | 'login' | 'logout' | 'login_failed'
+  | 'settle' | 'release_cash';
 
 export type AuditModule =
   | 'income' | 'expense' | 'donation'
   | 'receipt_book' | 'voucher_book'
   | 'report' | 'committee' | 'event'
+  | 'advance' | 'budget' | 'memo' | 'promise'
   | 'user' | 'settings' | 'backup' | 'auth';
 
 export interface AuditLog {
   id?: number;
-  timestamp: string; // ISO
+  timestamp: string;
   userId?: number;
   username: string;
   action: AuditAction;
   module: AuditModule;
   recordId?: number;
   recordCode?: string;
-  oldValue?: string; // JSON
-  newValue?: string; // JSON
+  oldValue?: string;
+  newValue?: string;
   reason?: string;
   device?: string;
   ipAddress?: string;
@@ -405,7 +411,7 @@ export interface CommitteeMember {
   joiningDate: string;
   leavingDate?: string;
   contact?: string;
-  photo?: string; // base64
+  photo?: string;
   responsibilities?: string;
   isActive: boolean;
 }
@@ -425,16 +431,19 @@ export interface CommitteeHandover {
 // ─── Events ───────────────────────────────────────────────────────────────────
 
 export type EventType = 'football_tournament' | 'annual_meal' | 'meeting' | 'picnic' | 'seminar' | 'custom';
-export type EventStatus = 'planned' | 'ongoing' | 'completed' | 'cancelled';
+export type EventStatus = 'planning' | 'approved' | 'active' | 'completed' | 'archived' | 'cancelled';
 
 export interface ClubEvent {
   id?: number;
   eventCode: string;
   name: string;
   type: EventType;
+  category?: string;
   date: string;
   endDate?: string;
   venue?: string;
+  organizer?: string;
+  committeeId?: number;
   budget: number;
   description?: string;
   status: EventStatus;
@@ -447,20 +456,170 @@ export interface ClubEvent {
   updatedAt: string;
 }
 
+// ─── Event Budget ─────────────────────────────────────────────────────────────
+
+export type BudgetStatus = 'draft' | 'pending' | 'approved' | 'locked';
+
+export interface Budget {
+  id?: number;
+  budgetCode: string;
+  name: string;
+  eventId: number;
+  approvalStatus: BudgetStatus;
+  createdBy: number;
+  createdByName: string;
+  lastModifiedBy?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BudgetCategory {
+  id?: number;
+  budgetId: number;
+  name: string;
+  estimatedAmount: number;
+  actualAmount: number;
+  notes?: string;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export interface BudgetRevision {
+  id?: number;
+  budgetCategoryId: number;
+  budgetId: number;
+  field: 'estimatedAmount' | 'actualAmount' | 'name' | 'notes';
+  previousValue: string;
+  newValue: string;
+  reason?: string;
+  revisedBy: number;
+  revisedByName: string;
+  revisedAt: string;
+}
+
+// ─── Advances ─────────────────────────────────────────────────────────────────
+
+export type AdvanceStatus =
+  | 'draft' | 'pending' | 'approved' | 'cash_released'
+  | 'partially_settled' | 'fully_settled' | 'cancelled';
+
+export interface Advance {
+  id?: number;
+  advanceCode: string;
+  voucherNumber?: string;
+  date: string;
+  personName: string;
+  designation?: string;
+  eventId?: number;
+  purpose: string;
+  amountGiven: number;
+  paymentMethod: 'cash' | 'bank' | 'mobile_banking';
+  status: AdvanceStatus;
+  amountSpent: number;
+  amountReturned: number;
+  outstandingAmount: number;
+  notes?: string;
+  createdBy: number;
+  approvedBy?: number;
+  approvedAt?: string;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdvanceSettlement {
+  id?: number;
+  advanceId: number;
+  settlementDate: string;
+  billsSubmitted: number;
+  cashReturned: number;
+  notes?: string;
+  attachments?: string; // JSON array of base64
+  settledBy: number;
+  settledByName: string;
+  createdAt: string;
+}
+
+// ─── Reminders ────────────────────────────────────────────────────────────────
+
+export type ReminderType =
+  | 'advance_settlement' | 'donation_followup' | 'pending_bills'
+  | 'missing_voucher' | 'meeting' | 'budget_review' | 'event_deadline' | 'custom';
+
+export type ReminderFrequency = 'once' | 'daily' | 'weekly' | 'monthly' | 'custom_date';
+export type ReminderStatus = 'pending' | 'done' | 'dismissed';
+
+export interface Reminder {
+  id?: number;
+  type: ReminderType;
+  title: string;
+  description?: string;
+  dueDate: string;
+  frequency: ReminderFrequency;
+  status: ReminderStatus;
+  recordType?: RecordType;
+  recordId?: number;
+  createdBy: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ─── Financial Memo ───────────────────────────────────────────────────────────
+
+export type MemoPriority = 'low' | 'normal' | 'high' | 'urgent';
+export type MemoStatus = 'open' | 'resolved' | 'archived';
+
+export interface Memo {
+  id?: number;
+  memoNumber: string;
+  date: string;
+  subject: string;
+  description: string;
+  priority: MemoPriority;
+  status: MemoStatus;
+  relatedEventId?: number;
+  relatedRecordType?: RecordType;
+  relatedRecordId?: number;
+  reminderDate?: string;
+  createdBy: number;
+  createdByName: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ─── Promise Register ─────────────────────────────────────────────────────────
+
+export type PromiseStatus = 'promised' | 'confirmed' | 'received' | 'cancelled';
+
+export interface PromiseRecord {
+  id?: number;
+  promiseCode: string;
+  promisedBy: string;         // person or org name
+  phone?: string;
+  amount: number;
+  description: string;        // what was promised
+  promiseDate: string;
+  expectedDate?: string;
+  status: PromiseStatus;
+  receivedAmount?: number;
+  receivedDate?: string;
+  notes?: string;
+  reminderDate?: string;
+  createdBy: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ─── Notifications ────────────────────────────────────────────────────────────
 
 export type NotificationType =
-  | 'contribution_reminder'
-  | 'hospital_contribution_reminder'
-  | 'pending_approval'
-  | 'low_voucher_count'
-  | 'backup_reminder'
-  | 'event_reminder'
-  | 'general';
+  | 'contribution_reminder' | 'hospital_contribution_reminder'
+  | 'pending_approval' | 'low_voucher_count' | 'backup_reminder'
+  | 'event_reminder' | 'advance_overdue' | 'promise_due' | 'general';
 
 export interface AppNotification {
   id?: number;
-  userId?: number; // null = all users
+  userId?: number;
   type: NotificationType;
   title: string;
   message: string;
@@ -474,7 +633,7 @@ export interface AppNotification {
 
 export interface Setting {
   key: string;
-  value: string; // JSON-encoded
+  value: string;
   updatedAt: string;
   updatedBy?: number;
 }
@@ -507,6 +666,8 @@ export interface DashboardStats {
   pendingApprovals: number;
   receiptBooksRemaining: number;
   voucherBooksRemaining: number;
+  pendingAdvances: number;
+  outstandingAdvanceAmount: number;
   recentTransactions: RecentTransaction[];
   upcomingEvents: ClubEvent[];
   monthlyChart: MonthlyChartData[];
@@ -514,12 +675,12 @@ export interface DashboardStats {
 
 export interface RecentTransaction {
   id: number;
-  type: 'income' | 'expense' | 'donation';
+  type: 'income' | 'expense' | 'donation' | 'advance';
   code: string;
   description: string;
   amount: number;
   date: string;
-  status: RecordStatus;
+  status: RecordStatus | AdvanceStatus;
   category: string;
 }
 

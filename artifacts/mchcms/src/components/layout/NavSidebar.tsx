@@ -2,31 +2,24 @@ import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent
+  Sidebar, SidebarContent, SidebarFooter, SidebarHeader,
+  SidebarMenu, SidebarMenuItem, SidebarMenuButton,
+  SidebarGroup, SidebarGroupLabel, SidebarGroupContent
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { Building2, LayoutDashboard, Wallet, Receipt, Heart, BookOpen, FileText, Users, Calendar, ShieldAlert, Settings, LogOut, Sun, Moon } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  Building2, LayoutDashboard, Wallet, Receipt, Heart, BookOpen,
+  FileText, Users, Calendar, ShieldAlert, Settings, LogOut, Sun, Moon,
+  CreditCard, BookMarked, StickyNote, Handshake, BookOpenCheck
+} from 'lucide-react';
 
 export function NavSidebar() {
   const { user, logout, hasPermission } = useAuth();
   const { resolvedTheme, toggleTheme } = useTheme();
   const [location] = useLocation();
 
-  const handleLogout = async () => {
-    await logout();
-  };
-
-  const NavItem = ({ href, icon: Icon, label }: { href: string; icon: any; label: string }) => {
+  const NavItem = ({ href, icon: Icon, label }: { href: string; icon: React.ComponentType<{ className?: string }>; label: string }) => {
     const isActive = location === href || (href !== '/' && location.startsWith(href));
     return (
       <SidebarMenuItem>
@@ -69,6 +62,8 @@ export function NavSidebar() {
               <NavItem href="/income" icon={Wallet} label="Income" />
               <NavItem href="/expense" icon={Receipt} label="Expenses" />
               <NavItem href="/donations" icon={Heart} label="Donations" />
+              <NavItem href="/advances" icon={CreditCard} label="Advances" />
+              <NavItem href="/cashbook" icon={BookOpenCheck} label="Cash Book" />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -90,6 +85,16 @@ export function NavSidebar() {
               <NavItem href="/reports" icon={FileText} label="Reports" />
               <NavItem href="/committee" icon={Users} label="Committee" />
               <NavItem href="/events" icon={Calendar} label="Events" />
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Records</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <NavItem href="/memos" icon={StickyNote} label="Memo Book" />
+              <NavItem href="/promises" icon={Handshake} label="Promises" />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -123,7 +128,7 @@ export function NavSidebar() {
           <Button variant="outline" size="icon" className="flex-1 h-9 shadow-sm" onClick={toggleTheme} title="Toggle Theme">
             {resolvedTheme === 'dark' ? <Sun className="size-4 text-amber-500" /> : <Moon className="size-4 text-blue-500" />}
           </Button>
-          <Button variant="outline" size="sm" className="flex-[3] h-9 gap-2 shadow-sm text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/20 hover:border-destructive/30" onClick={handleLogout}>
+          <Button variant="outline" size="sm" className="flex-[3] h-9 gap-2 shadow-sm text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/20 hover:border-destructive/30" onClick={() => logout()}>
             <LogOut className="size-4" />
             <span>Sign out</span>
           </Button>

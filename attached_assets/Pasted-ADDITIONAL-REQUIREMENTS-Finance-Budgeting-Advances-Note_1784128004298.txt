@@ -1,0 +1,430 @@
+ADDITIONAL REQUIREMENTS (Finance, Budgeting, Advances, Notes & Tracking)
+Event Budget Management
+
+Every event must begin with a budgeting phase before any income or expenses are recorded.
+
+Each event shall contain:
+
+Event ID
+Event Name
+Event Category
+Event Description
+Organizer
+Committee
+Event Status (Planning, Approved, Active, Completed, Archived)
+Start Date
+End Date
+Venue
+Event Cover Photo
+Event Documents
+Budget Planning
+
+Allow users to create a complete budget before the event starts.
+
+Budget fields:
+
+Budget ID
+Budget Name
+Event ID
+Budget Creation Date
+Created By
+Last Modified
+Approval Status
+
+Budget Categories must be unlimited and user configurable.
+
+Examples:
+
+Ground Rent
+Refreshments
+Football
+Trophy
+Medals
+Transportation
+Sound System
+Decorations
+Printing
+Stationery
+Emergency Fund
+Miscellaneous
+
+Each category must contain:
+
+Estimated Amount
+Actual Amount
+Remaining Amount
+Variance
+Percentage Used
+Notes
+
+Dashboard should automatically display
+
+Total Estimated Budget
+Total Actual Expense
+Total Remaining Budget
+Budget Utilization Percentage
+
+Display budget progress using charts and progress bars.
+
+Generate Budget Reports in PDF, Excel and Print format.
+
+Advance Cash Management
+
+The system must support giving advance cash to committee members before purchases.
+
+Create a dedicated Advance Management module.
+
+Each Advance shall contain:
+
+Advance ID
+Advance Voucher Number
+Advance Date
+Person Receiving Advance
+Designation
+Event
+Purpose
+Amount Given
+Payment Method
+Voucher Number
+Receipt Number
+Attachments
+Images
+PDFs
+Notes
+Created By
+Approved By
+Status
+
+Advance Status
+
+Draft
+Pending Approval
+Approved
+Cash Released
+Partially Settled
+Fully Settled
+Cancelled
+Advance Settlement
+
+Support complete settlement workflow.
+
+Example
+
+Advance Given
+
+10,000 Taka
+
+Bills Submitted
+
+9,250 Taka
+
+Cash Returned
+
+750 Taka
+
+System automatically calculates
+
+Amount Spent
+Amount Returned
+Outstanding Amount
+
+Automatically closes advance when fully settled.
+
+Support multiple settlement entries.
+
+Outstanding Advance Tracking
+
+Dashboard should display
+
+Total Pending Advances
+Total Outstanding Amount
+Overdue Advances
+Advances Due Today
+Advances Due This Week
+Fully Settled Advances
+
+Generate reminder notifications automatically.
+
+Cash Flow Tracking
+
+Maintain a complete running cash book.
+
+Every financial transaction must appear automatically.
+
+Including
+
+Donations
+Employee Contributions
+Hospital Contributions
+Advance Payments
+Advance Settlements
+Event Expenses
+Refunds
+Miscellaneous Income
+Miscellaneous Expenses
+
+Display
+
+Opening Balance
+Transaction Amount
+Closing Balance
+
+Allow filtering by
+
+Date
+Category
+Person
+Event
+Amount
+Voucher
+Receipt
+Notes & Timeline System
+
+Every record in the system must contain a Notes Timeline.
+
+Each note stores
+
+Date
+Time
+User
+Comment
+Attachment (optional)
+
+Notes must never be deleted.
+
+Notes become part of the permanent record.
+
+Example timeline
+
+15 Jul 2026
+
+Advance of Tk. 5,000 issued to Mr. John for football purchase.
+
+17 Jul 2026
+
+Supplier delayed delivery.
+
+20 Jul 2026
+
+Bills submitted.
+
+Returned Tk. 450.
+
+Follow-up Reminder System
+
+Users can create reminders for any transaction.
+
+Reminder types
+
+Advance Settlement
+Donation Follow-up
+Pending Bills
+Missing Voucher
+Meeting Reminder
+Budget Review
+Event Deadline
+
+Reminder options
+
+One Time
+Daily
+Weekly
+Monthly
+Custom Date
+
+Dashboard displays all pending reminders.
+
+Financial Memo Book
+
+Create a digital memo register.
+
+Purpose
+
+Store important financial notes that are not transactions.
+
+Examples
+
+Cash kept in locker.
+Treasurer handed over cash to secretary temporarily.
+Bank closed today.
+Waiting for approval from hospital authority.
+Donation promised but not yet received.
+
+Each memo includes
+
+Memo Number
+Date
+Subject
+Description
+Priority
+Attachments
+Related Event
+Related Transaction
+Reminder Date
+Status
+Promise Register
+
+Support recording promises.
+
+Examples
+
+Hospital Authority promised Tk. 20,000 donation.
+
+Mr. ABC promised football sponsorship.
+
+Status
+
+Promised
+Confirmed
+Received
+Cancelled
+
+Automatically remind users if promised donations remain outstanding.
+
+Event Financial Summary
+
+After an event ends automatically generate
+
+Budget Summary
+Income Summary
+Expense Summary
+Donation Summary
+Advance Summary
+Settlement Summary
+Remaining Balance
+Profit/Loss
+QR Code
+Attachments
+Photos
+Complete Audit History
+
+Export
+
+PDF
+
+Excel
+
+CSV
+
+Print
+
+Budget Revision History
+
+Budgets must never overwrite previous values.
+
+Every modification creates a new revision.
+
+Store
+
+Previous Amount
+New Amount
+Date
+User
+Reason
+
+Allow viewing the complete budget history.
+
+Financial Approval Workflow
+
+Support multi-level approvals.
+
+Workflow
+
+Draft
+
+↓
+
+Prepared by Cashier
+
+↓
+
+Verified by Secretary
+
+↓
+
+Approved by President
+
+↓
+
+Locked
+
+↓
+
+Archived
+
+Once locked
+
+Financial records cannot be edited.
+
+Corrections require adjustment entries.
+
+Never overwrite financial history.
+
+Financial Dashboard Enhancements
+
+Dashboard widgets
+
+Current Cash Balance
+
+Today's Income
+
+Today's Expense
+
+Monthly Income
+
+Monthly Expense
+
+Budget Progress
+
+Pending Advances
+
+Outstanding Advances
+
+Donation Collection Progress
+
+Upcoming Events
+
+Recent Notes
+
+Recent Financial Activities
+
+Pending Approvals
+
+Pending Settlements
+
+Cash Flow Graph
+
+Income vs Expense Graph
+
+Budget vs Actual Graph
+
+Future Expansion Ready
+
+Design database and architecture to support future modules without changing existing financial records.
+
+Future modules may include
+
+Inventory Management
+Fixed Assets
+Asset Depreciation
+Banking
+Cheque Management
+Loan Management
+Scholarship Fund
+Welfare Fund
+Emergency Relief Fund
+Digital Signature
+OCR Receipt Reading
+Barcode
+QR Attendance
+Election Management
+IMPORTANT DEVELOPMENT RULES
+Never delete financial records.
+Always use audit logs.
+Use soft delete only where appropriate.
+Every financial change must be traceable.
+Every report must be reproducible.
+Keep all modules loosely coupled and modular.
+Optimize for long-term maintainability.
+Ensure all functionality works offline first and synchronizes safely when connectivity is available.
+Maintain a clean, responsive, and professional user interface suitable for long-term use by a non-profit organization.

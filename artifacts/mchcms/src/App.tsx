@@ -20,6 +20,13 @@ import { Reports } from '@/pages/Reports/Reports';
 import { Committee } from '@/pages/Committee/Committee';
 import { EventList } from '@/pages/Events/EventList';
 import { EventForm } from '@/pages/Events/EventForm';
+import { EventBudget } from '@/pages/Events/EventBudget';
+import { AdvanceList } from '@/pages/Advances/AdvanceList';
+import { AdvanceForm } from '@/pages/Advances/AdvanceForm';
+import { AdvanceDetail } from '@/pages/Advances/AdvanceDetail';
+import { CashBook } from '@/pages/CashBook/CashBook';
+import { Memos } from '@/pages/Memos/Memos';
+import { Promises } from '@/pages/Promises/Promises';
 import { AuditLog } from '@/pages/Audit/AuditLog';
 import { Settings } from '@/pages/Settings/Settings';
 
@@ -56,9 +63,16 @@ function App() {
                       <Route path="/receipt-books" component={ReceiptBooks} />
                       <Route path="/voucher-books" component={VoucherBooks} />
                       <Route path="/reports" component={Reports} />
+                      <Route path="/cashbook" component={CashBook} />
                       <Route path="/committee" component={Committee} />
                       <Route path="/events" component={EventList} />
                       <Route path="/events/new" component={EventForm} />
+                      <Route path="/events/:id/budget" component={EventBudget} />
+                      <Route path="/advances" component={AdvanceList} />
+                      <Route path="/advances/new" component={AdvanceForm} />
+                      <Route path="/advances/:id" component={AdvanceDetail} />
+                      <Route path="/memos" component={Memos} />
+                      <Route path="/promises" component={Promises} />
                       <Route path="/audit" component={AuditLog} />
                       <Route path="/settings" component={Settings} />
                       <Route component={NotFound} />

@@ -56,7 +56,7 @@ export function EventForm() {
         budget: data.budget,
         description: data.description,
         sponsors: data.sponsors,
-        status: 'planned' as const,
+        status: 'planning' as const,
         totalIncome: 0,
         totalExpense: 0,
         netBalance: 0,
