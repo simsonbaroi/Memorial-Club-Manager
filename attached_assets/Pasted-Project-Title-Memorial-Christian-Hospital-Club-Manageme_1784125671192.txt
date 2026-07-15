@@ -1,0 +1,948 @@
+Project Title
+
+Memorial Christian Hospital Club Management System (MCHCMS)
+
+Project Overview
+
+Develop a complete Enterprise Resource Planning (ERP) Progressive Web Application (PWA) for Memorial Christian Hospital Club, Malumghat, Chakaria, Cox's Bazar, Bangladesh.
+
+This is a non-profit club. The application will manage every financial and administrative activity of the club for many years.
+
+The system must be designed to run 100% free, without depending on paid APIs or paid cloud services.
+
+The application must be offline-first, support automatic synchronization between multiple devices, and work seamlessly on Windows, Android, iPhone, macOS, and Linux.
+
+The application should be professionally designed and scalable for at least the next 20–30 years without changing the database structure.
+
+Technology Stack
+
+Use the following technologies.
+
+Frontend
+
+React
+
+TypeScript
+
+TailwindCSS
+
+Progressive Web App (PWA)
+
+Backend
+
+Node.js
+
+Express.js
+
+Database
+
+SQLite
+
+Synchronization
+
+Design the synchronization layer to support future integration with free peer-to-peer synchronization such as Syncthing or a custom synchronization module.
+
+Authentication
+
+JWT
+
+Password Hashing
+
+Role Based Authentication
+
+File Storage
+
+Store images and PDFs in organized folders.
+
+Only store file paths inside SQLite.
+
+Generate PDFs locally.
+
+Generate QR Codes locally.
+
+No paid APIs.
+
+No Firebase.
+
+No Supabase.
+
+No MongoDB Atlas.
+
+No online cloud database.
+
+Everything must run locally.
+
+General Requirements
+
+The application must
+
+Work completely offline.
+
+Automatically synchronize when network becomes available.
+
+Support installation as a Progressive Web App.
+
+Support Windows
+
+Android
+
+iPhone
+
+Linux
+
+macOS
+
+Responsive Design
+
+Dark Mode
+
+Light Mode
+
+Automatic Backup
+
+Restore
+
+Audit Log
+
+Version History
+
+Role Based Permission
+
+Professional UI
+
+Professional UX
+
+Fast Performance
+
+Organization
+
+Organization Name
+
+Memorial Christian Hospital Club
+
+Location
+
+Malumghat
+
+Chakaria
+
+Cox's Bazar
+
+Bangladesh
+
+Timezone
+
+Asia/Dhaka
+
+UTC +06:00
+
+Date Format
+
+Store internally
+
+ISO 8601
+
+Display everywhere
+
+15th July 2026
+
+07:26 PM
+
+Timezone
+
+Asia/Dhaka (UTC+06)
+
+User Roles
+
+Administrator
+
+President
+
+Vice President
+
+Secretary
+
+Cashier
+
+Committee Member
+
+Auditor
+
+Viewer
+
+Permissions must be configurable individually.
+
+Dashboard
+
+Show
+
+Current Balance
+
+Today's Income
+
+Today's Expense
+
+Monthly Income
+
+Monthly Expense
+
+Yearly Income
+
+Yearly Expense
+
+Donation Summary
+
+Employee Contribution
+
+Hospital Contribution
+
+Cash Book Summary
+
+Recent Transactions
+
+Pending Approval
+
+Receipt Books Remaining
+
+Voucher Books Remaining
+
+Upcoming Events
+
+Recent Activities
+
+Charts
+
+Notifications
+
+Quick Buttons
+
+Income Module
+
+Categories
+
+Employee Contribution
+
+Hospital Contribution
+
+Donation
+
+Special Donation
+
+Event Income
+
+Interest
+
+Miscellaneous
+
+Custom
+
+Each income includes
+
+Income ID
+
+Receipt Number
+
+Date
+
+Entry Date
+
+Amount
+
+Description
+
+Source
+
+Category
+
+Attachment
+
+Images
+
+PDF
+
+Remarks
+
+Created By
+
+Approved By
+
+Audit Log
+
+QR Code
+
+Employee Contribution
+
+Quick Entry
+
+Month
+
+Year
+
+Employee Count
+
+Contribution Per Employee
+
+Automatically calculate
+
+310 × 10
+
+3100
+
+Support editing employee count.
+
+Hospital Contribution
+
+Quick monthly entry.
+
+Default
+
+500 taka
+
+Editable.
+
+Donation Module
+
+Donor Name
+
+Phone
+
+Address
+
+Purpose
+
+Amount
+
+Receipt Number
+
+Images
+
+PDF
+
+Notes
+
+Generate Receipt
+
+Generate QR
+
+Print Receipt
+
+Expense Module
+
+Expense Categories
+
+Office Supplies
+
+Refreshments
+
+Tea
+
+Meeting
+
+Football Tournament
+
+Annual Meal
+
+Transportation
+
+Printing
+
+Stationery
+
+Decoration
+
+Prize
+
+Medical Help
+
+Miscellaneous
+
+Unlimited Custom Categories
+
+Each Expense Includes
+
+Voucher Number
+
+Date
+
+Amount
+
+Payee
+
+Description
+
+Images
+
+PDF
+
+Approval
+
+QR
+
+Audit
+
+Remarks
+
+Receipt Book Management
+
+Physical Receipt Books
+
+Book Number
+
+Start Number
+
+End Number
+
+Issue Date
+
+Issued To
+
+Current Number
+
+Remaining Numbers
+
+Statuses
+
+Unused
+
+Used
+
+Voided
+
+Missing
+
+Damaged
+
+Recovered
+
+Cancelled
+
+Archived
+
+Voucher Book Management
+
+Same system for
+
+Cash Payment Voucher
+
+Journal Voucher
+
+Approval Voucher
+
+Future Voucher Types
+
+Manual Receipt Number
+
+Allow manual typing.
+
+Example
+
+DR-000245
+
+System automatically detects
+
+Already Used
+
+Missing
+
+Voided
+
+Duplicate
+
+Out of Range
+
+If valid
+
+Automatically suggest
+
+DR-000246
+
+for next entry.
+
+Manual Cash Voucher Number
+
+Exactly same behavior.
+
+Example
+
+PV-000580
+
+Automatically detect next number
+
+PV-000581
+
+QR Code System
+
+Every
+
+Voucher
+
+Receipt
+
+Report
+
+Event
+
+Member
+
+Must have QR Code.
+
+Scanning QR opens
+
+Digital Record
+
+Attachments
+
+PDF
+
+Images
+
+Audit
+
+History
+
+Version
+
+Metadata
+
+Document Management
+
+Unlimited Images
+
+Unlimited PDFs
+
+Unlimited Attachments
+
+Take Photo
+
+Choose Gallery
+
+Drag Drop
+
+Multiple Upload
+
+Preview
+
+Zoom
+
+Download
+
+Print
+
+Mobile Camera Integration
+
+When using desktop
+
+Click
+
+Attach
+
+Generate QR
+
+Phone scans QR
+
+Camera opens
+
+Take Picture
+
+Automatically uploads
+
+Automatically linked to current transaction.
+
+Reports
+
+Daily
+
+Weekly
+
+Monthly
+
+Yearly
+
+Custom Date
+
+Income
+
+Expense
+
+Donation
+
+Event
+
+Category
+
+Ledger
+
+Cash Book
+
+Audit
+
+Receipt Register
+
+Voucher Register
+
+Employee Contribution
+
+Hospital Contribution
+
+Committee Report
+
+Annual Report
+
+Export
+
+PDF
+
+Excel
+
+CSV
+
+Print
+
+A4
+
+Letter
+
+Portrait
+
+Landscape
+
+Printed Reports
+
+Include QR Code
+
+Scanning opens
+
+Complete digital report
+
+Images
+
+PDF
+
+Transactions
+
+Attachments
+
+Metadata
+
+Version History
+
+Audit Trail
+
+Every action recorded.
+
+Create
+
+Edit
+
+Approve
+
+Reject
+
+Delete
+
+Restore
+
+Lock
+
+Unlock
+
+Print
+
+Export
+
+Backup
+
+Restore
+
+User Login
+
+User Logout
+
+Store
+
+Date
+
+Time
+
+Device
+
+User
+
+Old Value
+
+New Value
+
+Reason
+
+Never delete logs.
+
+Record Locking
+
+Workflow
+
+Draft
+
+↓
+
+Pending
+
+↓
+
+Approved
+
+↓
+
+Locked
+
+↓
+
+Archived
+
+Locked records cannot be modified.
+
+Corrections create new version.
+
+Original always preserved.
+
+Committee Management
+
+Committee Name
+
+Members
+
+Designation
+
+Joining Date
+
+Leaving Date
+
+Contact
+
+Photo
+
+Responsibilities
+
+Handover Records
+
+Event Management
+
+Football Tournament
+
+Annual Meal
+
+Meetings
+
+Picnic
+
+Seminar
+
+Custom Events
+
+Each Event
+
+Budget
+
+Income
+
+Expense
+
+Donation
+
+Sponsors
+
+Photos
+
+Reports
+
+QR
+
+Search
+
+Global Search
+
+Search by
+
+Voucher
+
+Receipt
+
+Amount
+
+Date
+
+Member
+
+Description
+
+PDF
+
+Images
+
+Category
+
+Everything.
+
+Notification
+
+Monthly Contribution Reminder
+
+Hospital Contribution Reminder
+
+Pending Approval
+
+Low Voucher Count
+
+Backup Reminder
+
+Event Reminder
+
+Security
+
+Encrypted Password
+
+Role Permission
+
+Auto Logout
+
+Session Management
+
+Device Authorization
+
+Fingerprint Ready
+
+PIN Ready
+
+Backup
+
+Daily
+
+Weekly
+
+Monthly
+
+Manual
+
+Automatic
+
+Restore
+
+Export Backup
+
+Synchronization
+
+Offline First
+
+Local SQLite Database
+
+Background Sync
+
+Conflict Detection
+
+Automatic Merge
+
+Future Syncthing Support
+
+Database
+
+Normalize database.
+
+Around
+
+50–70 tables.
+
+Use proper foreign keys.
+
+Never duplicate data.
+
+Maintain referential integrity.
+
+Future Modules
+
+Inventory
+
+Assets
+
+Library
+
+Attendance
+
+Election
+
+Notice Board
+
+Budget Planning
+
+Bank Management
+
+Cheque Management
+
+Digital Signature
+
+OCR
+
+Barcode
+
+SMS
+
+Email
+
+UI
+
+Professional
+
+Modern
+
+Clean
+
+Material Design
+
+Animated
+
+Responsive
+
+Fast
+
+Minimal
+
+Hospital Blue Theme
+
+Gold Accent
+
+White Background
+
+Rounded Cards
+
+Professional Dashboard
+
+Charts
+
+Icons
+
+Important Rule
+
+Never hardcode anything.
+
+Everything configurable.
+
+Never delete financial records.
+
+Soft delete only.
+
+Every change must create an audit log.
+
+Every report must be reproducible.
+
+The system must be designed for long-term use by future committees.
+
+The application should be modular, scalable, maintainable, secure, and written with clean code principles.
+
+Final Instruction to Replit AI
+
+Do not generate this project in a single step.
+
+First, create a complete project architecture and folder structure.
+Then create the SQLite database schema and migrations.
+Then implement authentication.
+Then build each module incrementally.
+After each completed module, verify functionality before proceeding to the next.
+Use clean, documented code with comments, reusable components, and maintainable architecture. Do not use placeholder implementations where a complete implementation is feasible.
