@@ -1,4 +1,6 @@
 import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export function exportToExcel(data: Record<string, unknown>[], filename: string, sheetName = 'Sheet1') {
   const ws = XLSX.utils.json_to_sheet(data);
@@ -29,6 +31,73 @@ export function exportToCSV(data: Record<string, unknown>[], filename: string) {
   link.download = `${filename}.csv`;
   link.click();
   URL.revokeObjectURL(url);
+}
+
+export interface PDFTableOptions {
+  title: string;
+  subtitle?: string;
+  meta?: { label: string; value: string }[];
+  head: string[][];
+  body: (string | number)[][];
+  filename: string;
+  footer?: string;
+}
+
+function buildPDF(opts: PDFTableOptions): jsPDF {
+  const doc = new jsPDF();
+  doc.setFontSize(16);
+  doc.setTextColor(21, 101, 192);
+  doc.text(opts.title, 14, 18);
+
+  let cursorY = 26;
+  if (opts.subtitle) {
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(opts.subtitle, 14, cursorY);
+    cursorY += 7;
+  }
+
+  if (opts.meta?.length) {
+    doc.setFontSize(9);
+    doc.setTextColor(60);
+    opts.meta.forEach((m) => {
+      doc.text(`${m.label}: ${m.value}`, 14, cursorY);
+      cursorY += 5;
+    });
+    cursorY += 3;
+  }
+
+  autoTable(doc, {
+    startY: cursorY,
+    head: opts.head,
+    body: opts.body,
+    styles: { fontSize: 8, cellPadding: 2 },
+    headStyles: { fillColor: [21, 101, 192], textColor: 255 },
+    alternateRowStyles: { fillColor: [245, 247, 250] },
+  });
+
+  const pageCount = doc.getNumberOfPages();
+  for (let p = 1; p <= pageCount; p++) {
+    doc.setPage(p);
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    doc.setFontSize(7.5);
+    doc.setTextColor(140);
+    doc.text(opts.footer ?? `Generated ${nowBD()} · MCHCMS`, 14, pageHeight - 8);
+    doc.text(`Page ${p} of ${pageCount}`, pageWidth - 30, pageHeight - 8);
+  }
+
+  return doc;
+}
+
+export function exportToPDF(opts: PDFTableOptions) {
+  buildPDF(opts).save(`${opts.filename}.pdf`);
+}
+
+export function printPDF(opts: PDFTableOptions) {
+  const doc = buildPDF(opts);
+  doc.autoPrint();
+  window.open(doc.output('bloburl'), '_blank');
 }
 
 export function formatCurrencyBDT(amount: number): string {

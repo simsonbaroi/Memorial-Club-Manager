@@ -1,10 +1,128 @@
 import { useState, useEffect } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '@/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getDashboardStats, type DashboardStats } from '@/db';
+import { getDashboardStats, type DashboardStats, type ReminderType, type ReminderFrequency } from '@/db';
 import { formatCurrencyBDT, formatDateBD } from '@/lib/export';
-import { Wallet, TrendingUp, TrendingDown, Heart, FileText } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Heart, FileText, Bell, Plus, Check, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link } from 'wouter';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
+
+const REMINDER_TYPE_LABELS: Record<ReminderType, string> = {
+  advance_settlement: 'Advance Settlement',
+  donation_followup: 'Donation Follow-up',
+  pending_bills: 'Pending Bills',
+  missing_voucher: 'Missing Voucher',
+  meeting: 'Meeting',
+  budget_review: 'Budget Review',
+  event_deadline: 'Event Deadline',
+  custom: 'Custom',
+};
+
+function RemindersWidget() {
+  const { user } = useAuth();
+  const [showAdd, setShowAdd] = useState(false);
+  const [title, setTitle] = useState('');
+  const [type, setType] = useState<ReminderType>('custom');
+  const [dueDate, setDueDate] = useState(new Date().toISOString().slice(0, 10));
+  const [frequency, setFrequency] = useState<ReminderFrequency>('once');
+
+  const reminders = useLiveQuery(() => db.reminders.filter(r => r.status === 'pending').sortBy('dueDate'));
+  const todayStr = new Date().toISOString().slice(0, 10);
+
+  const handleAdd = async () => {
+    if (!title.trim() || !dueDate) { toast.error('Title and due date are required'); return; }
+    const now = new Date().toISOString();
+    await db.reminders.add({
+      type, title: title.trim(), dueDate, frequency,
+      status: 'pending', createdBy: user!.id!, createdAt: now, updatedAt: now,
+    });
+    setTitle(''); setDueDate(new Date().toISOString().slice(0, 10)); setType('custom'); setFrequency('once');
+    setShowAdd(false);
+    toast.success('Reminder added');
+  };
+
+  const handleMarkDone = async (id: number) => {
+    await db.reminders.update(id, { status: 'done', updatedAt: new Date().toISOString() });
+  };
+
+  return (
+    <Card className="shadow-sm">
+      <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b">
+        <CardTitle className="text-sm font-semibold flex items-center gap-1.5">
+          <Bell className="size-3.5 text-amber-500" /> Pending Reminders
+          {(reminders?.length ?? 0) > 0 && <Badge variant="outline" className="text-xs ml-1">{reminders?.length}</Badge>}
+        </CardTitle>
+        <Button size="sm" variant="ghost" className="h-7 gap-1 text-xs" onClick={() => setShowAdd(v => !v)}>
+          <Plus className="size-3.5" /> Add
+        </Button>
+      </CardHeader>
+      <CardContent className="p-0">
+        {showAdd && (
+          <div className="p-3 border-b bg-muted/30 space-y-2">
+            <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="Reminder title" className="h-8 text-sm" />
+            <div className="flex gap-2">
+              <Select value={type} onValueChange={v => setType(v as ReminderType)}>
+                <SelectTrigger className="h-8 text-xs flex-1"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {Object.entries(REMINDER_TYPE_LABELS).map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className="h-8 text-xs w-36" />
+            </div>
+            <div className="flex gap-2 items-center">
+              <Label className="text-xs text-muted-foreground">Repeats</Label>
+              <Select value={frequency} onValueChange={v => setFrequency(v as ReminderFrequency)}>
+                <SelectTrigger className="h-8 text-xs w-32"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="once">One Time</SelectItem>
+                  <SelectItem value="daily">Daily</SelectItem>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectItem value="custom_date">Custom Date</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="flex-1" />
+              <Button size="sm" className="h-7 text-xs" onClick={handleAdd}>Save</Button>
+              <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setShowAdd(false)}>Cancel</Button>
+            </div>
+          </div>
+        )}
+        {!reminders?.length ? (
+          <div className="text-center py-8 text-sm text-muted-foreground flex flex-col items-center gap-2">
+            <Bell className="size-5 opacity-20" /> No pending reminders
+          </div>
+        ) : (
+          <div className="divide-y">
+            {reminders.slice(0, 8).map(r => {
+              const overdue = r.dueDate < todayStr;
+              return (
+                <div key={r.id} className="flex items-center gap-3 px-4 py-2.5">
+                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${overdue ? 'bg-rose-500' : 'bg-amber-500'}`} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{r.title}</p>
+                    <p className={`text-xs ${overdue ? 'text-rose-600 font-medium' : 'text-muted-foreground'}`}>
+                      {REMINDER_TYPE_LABELS[r.type]} · {overdue ? 'Overdue' : 'Due'} {formatDateBD(r.dueDate)}
+                    </p>
+                  </div>
+                  <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" title="Mark done" onClick={() => handleMarkDone(r.id!)}>
+                    <Check className="size-3.5 text-emerald-600" />
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 export function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -90,6 +208,9 @@ export function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Pending Reminders */}
+      <RemindersWidget />
 
       {/* Receipt / Voucher remaining */}
       <div className="grid grid-cols-2 gap-4">

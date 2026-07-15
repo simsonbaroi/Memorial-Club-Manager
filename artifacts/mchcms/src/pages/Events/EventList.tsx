@@ -91,6 +91,14 @@ export function EventList() {
                     {event.netBalance >= 0 ? '+' : ''}{formatCurrencyBDT(event.netBalance)}
                   </span>
                 </div>
+                <div className="flex gap-2">
+                  <Button asChild variant="outline" size="sm" className="flex-1 h-8 text-xs">
+                    <Link href={`/events/${event.id}/budget`}>Budget</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="sm" className="flex-1 h-8 text-xs">
+                    <Link href={`/events/${event.id}/summary`}>Summary</Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))

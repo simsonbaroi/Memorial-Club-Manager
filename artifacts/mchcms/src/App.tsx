@@ -21,6 +21,7 @@ import { Committee } from '@/pages/Committee/Committee';
 import { EventList } from '@/pages/Events/EventList';
 import { EventForm } from '@/pages/Events/EventForm';
 import { EventBudget } from '@/pages/Events/EventBudget';
+import { EventSummary } from '@/pages/Events/EventSummary';
 import { AdvanceList } from '@/pages/Advances/AdvanceList';
 import { AdvanceForm } from '@/pages/Advances/AdvanceForm';
 import { AdvanceDetail } from '@/pages/Advances/AdvanceDetail';
@@ -68,6 +69,7 @@ function App() {
                       <Route path="/events" component={EventList} />
                       <Route path="/events/new" component={EventForm} />
                       <Route path="/events/:id/budget" component={EventBudget} />
+                      <Route path="/events/:id/summary" component={EventSummary} />
                       <Route path="/advances" component={AdvanceList} />
                       <Route path="/advances/new" component={AdvanceForm} />
                       <Route path="/advances/:id" component={AdvanceDetail} />

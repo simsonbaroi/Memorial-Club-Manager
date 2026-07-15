@@ -12,8 +12,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, Plus, Pencil, Check, X } from 'lucide-react';
-import { formatCurrencyBDT } from '@/lib/export';
+import { ArrowLeft, Plus, Pencil, Check, X, FileText, FileSpreadsheet, Printer, BarChart3 } from 'lucide-react';
+import { formatCurrencyBDT, formatDateBD, exportToExcel, exportToPDF, printPDF } from '@/lib/export';
 import { toast } from 'sonner';
 
 export function EventBudget() {
@@ -117,6 +117,42 @@ export function EventBudget() {
     toast.success('Actual amount updated');
   };
 
+  const buildReportOpts = () => ({
+    title: `Budget Report — ${activeBudget?.name ?? ''}`,
+    subtitle: event?.name,
+    meta: [
+      { label: 'Event Code', value: event?.eventCode ?? '' },
+      { label: 'Budget Status', value: activeBudget?.approvalStatus ?? '' },
+      { label: 'Generated', value: formatDateBD(new Date().toISOString()) },
+    ],
+    head: [['Category', 'Estimated', 'Actual', 'Remaining', '% Used', 'Notes']],
+    body: (categories ?? []).map(c => {
+      const remaining = c.estimatedAmount - c.actualAmount;
+      const pct = c.estimatedAmount > 0 ? (c.actualAmount / c.estimatedAmount) * 100 : 0;
+      return [c.name, formatCurrencyBDT(c.estimatedAmount), formatCurrencyBDT(c.actualAmount), formatCurrencyBDT(remaining), `${pct.toFixed(0)}%`, c.notes ?? ''];
+    }).concat([['Total', formatCurrencyBDT(totalEstimated), formatCurrencyBDT(totalActual), formatCurrencyBDT(totalEstimated - totalActual), `${utilization.toFixed(0)}%`, '']]),
+    filename: `budget_${event?.eventCode}_${activeBudget?.budgetCode}`,
+  });
+
+  const handleExportPDF = () => exportToPDF(buildReportOpts());
+  const handlePrint = () => printPDF(buildReportOpts());
+  const handleExportExcel = () => {
+    if (!categories?.length) { toast.error('No budget lines to export'); return; }
+    const data = categories.map(c => {
+      const remaining = c.estimatedAmount - c.actualAmount;
+      const pct = c.estimatedAmount > 0 ? (c.actualAmount / c.estimatedAmount) * 100 : 0;
+      return {
+        Category: c.name,
+        'Estimated (৳)': c.estimatedAmount,
+        'Actual (৳)': c.actualAmount,
+        'Remaining (৳)': remaining,
+        '% Used': `${pct.toFixed(0)}%`,
+        Notes: c.notes ?? '',
+      };
+    });
+    exportToExcel(data, `budget_${event?.eventCode}_${activeBudget?.budgetCode}`, 'Budget');
+  };
+
   if (!event) return <div className="p-8 text-center text-sm text-muted-foreground">Loading...</div>;
 
   return (
@@ -129,6 +165,22 @@ export function EventBudget() {
           <h2 className="text-xl font-bold truncate">{event.name}</h2>
           <p className="text-xs text-muted-foreground">Budget Management</p>
         </div>
+        {activeBudget && (categories?.length ?? 0) > 0 && (
+          <div className="hidden sm:flex gap-1.5 shrink-0">
+            <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs" onClick={handleExportPDF}>
+              <FileText className="size-3.5" /> PDF
+            </Button>
+            <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs text-emerald-600" onClick={handleExportExcel}>
+              <FileSpreadsheet className="size-3.5" /> Excel
+            </Button>
+            <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs" onClick={handlePrint}>
+              <Printer className="size-3.5" /> Print
+            </Button>
+          </div>
+        )}
+        <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs shrink-0" asChild>
+          <Link href={`/events/${eventId}/summary`}><BarChart3 className="size-3.5" /> Summary</Link>
+        </Button>
         {hasPermission('budget:create') && (
           <Button size="sm" className="gap-1.5 shrink-0" onClick={() => setShowNewBudget(true)}>
             <Plus className="size-3.5" /> New Budget
